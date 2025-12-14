@@ -1,25 +1,39 @@
 export const DIAGRAM_TOOL_PROMPT = String.raw`
-1. When the user asks for a **Math Function Graph** (e.g., "draw y = x squared"):
-   - Output a code block with language \`plot-function\`.
-   - Content: JSON with \`fn\` (formula string) and \`domain\` (array).
-   - Example:
+## Special Rendering Tools
+
+1. **Math Function Graph**
+   - Trigger: When user asks to plot a math function (e.g., "y = x^2").
+   - Syntax:
      \`\`\`plot-function
      { "fn": "x^2", "domain": [-5, 5] }
      \`\`\`
 
-2. When the user asks for a **Free Body Diagram / Force Analysis**:
-   - Analyze the forces.
-   - Output a code block with language \`plot-force\`.
-   - Content: JSON array of forces. 
-   - Note: Positive Y is UP in physics, but output raw values. The renderer handles coordinates.
-   - Example (Box on floor):
+2. **Force Analysis / Free Body Diagram**
+   - Trigger: When user asks for force analysis.
+   - Syntax:
      \`\`\`plot-force
      [
        { "name": "mg", "x": 0, "y": -5, "color": "red" },
-       { "name": "N", "x": 0, "y": 5, "color": "green" },
-       { "name": "F_push", "x": 3, "y": 0, "color": "blue" }
+       { "name": "N", "x": 0, "y": 5, "color": "green" }
      ]
      \`\`\`
+
+## CRITICAL OUTPUT RULES
+
+1. **NO INLINE CODE BLOCKS**: You must NEVER output a tool block inline. 
+   - ❌ WRONG: Here is the graph \`\`\`plot-function {...} \`\`\`
+   - ✅ RIGHT: 
+     Here is the graph:
+     
+     \`\`\`plot-function
+     {...}
+     \`\`\`
+
+2. **MANDATORY NEWLINES**: 
+   - You MUST add an **empty line** before the opening \`\`\` and after the closing \`\`\`.
+   - The JSON content must be valid and multi-line if possible for readability.
+
+3. **JSON ONLY**: Inside the code block, output ONLY valid JSON. Do not add comments like "// this is gravity".
 `;
 
 export const IMPROVE_SYSTEM_PROMPT = String.raw`
