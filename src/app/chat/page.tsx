@@ -1,5 +1,5 @@
+import ChatPage from "@/components/chat/page";
 import RequireAiKey from "@/components/guards/RequireAiKey";
-import ChatPage from "@/components/pages/ChatPage";
 
 export default function ChatRoute() {
   return (
