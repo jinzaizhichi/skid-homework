@@ -98,6 +98,7 @@ export function ChatMessages({ messages, resolvedSource }: ChatMessagesProps) {
                     <MemoizedMarkdown source={msg.content || "..."} />
                   </div>
                 </div>
+                {/* TODO: add action buttons */}
               </motion.div>
             ))
           )}

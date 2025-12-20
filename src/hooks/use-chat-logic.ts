@@ -305,6 +305,7 @@ export function useChatLogic() {
       toast.error(t("errors.send-failed"));
       if (chatId && assistantMessageId) {
         await updateMessage(chatId, assistantMessageId, {
+          error: true,
           content: "Error generating response.",
         });
       }

@@ -18,6 +18,7 @@ export interface ChatMessageRecord {
   chatId: string;
   role: ChatRole;
   content: string;
+  error: boolean;
   createdAt: number;
 }
 

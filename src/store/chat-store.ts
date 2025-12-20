@@ -123,6 +123,7 @@ export const useChatStore = create<ChatState>((set) => ({
         chatId,
         role: message.role,
         content: message.content,
+        error: false,
         createdAt: message.createdAt ?? Date.now(),
       })) ?? [];
 
@@ -159,6 +160,7 @@ export const useChatStore = create<ChatState>((set) => ({
       chatId,
       role: input.role,
       content: input.content,
+      error: false,
       createdAt: input.createdAt ?? Date.now(),
     };
 
