@@ -17,7 +17,7 @@ import {
 } from "@/store/problems-store";
 import SolutionsArea from "../areas/SolutionsArea";
 import { useSettingsStore } from "@/store/settings-store";
-import { binarizeImageFile } from "@/utils/image-post-processing";
+import { processImage } from "@/utils/image-post-processing";
 import { Button } from "../ui/button";
 import { useTranslation } from "react-i18next";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useShortcut } from "@/hooks/use-shortcut";
+import OpenCVLoader from "../OpenCVLoader";
 
 export default function ScanPage() {
   const { t } = useTranslation("commons", { keyPrefix: "scan-page" });
@@ -157,16 +158,18 @@ export default function ScanPage() {
       if (imageBinarizingRef.current) {
         initialItems.forEach((item) => {
           if (item.status === "rasterizing") {
-            binarizeImageFile(item.file)
-              .then((rasterizedResult) => {
+            console.log(`Processing image ${item.file.name}`);
+            processImage(item.file)
+              .then((result) => {
+                console.log(`Success processed image ${item.file.name}`);
                 updateFileItem(item.id, {
                   status: "pending",
-                  url: rasterizedResult.url,
-                  file: rasterizedResult.file,
+                  file: result.file,
+                  url: result.url,
                 });
               })
               .catch((error) => {
-                console.error(`Failed to rasterize ${item.file.name}:`, error);
+                console.error(`Failed to process ${item.file.name}:`, error);
                 updateFileItem(item.id, {
                   status: "failed",
                 });
@@ -415,6 +418,8 @@ ${traits}
 
   return (
     <>
+      <OpenCVLoader />
+
       <div className={cn("min-h-screen", isMobile && "pb-24")}>
         <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
           <header
