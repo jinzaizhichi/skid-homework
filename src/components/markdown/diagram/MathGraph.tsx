@@ -121,6 +121,20 @@ export default function MathGraph({ code }: { code: string }) {
             else graphType = "polyline";
           }
 
+          let finalRange: [number, number] | undefined = undefined;
+          if (
+            fnType !== "implicit" &&
+            Array.isArray(item.range) &&
+            item.range.length >= 2
+          ) {
+            const min = Number(item.range[0]);
+            const max = Number(item.range[1]);
+
+            if (!isNaN(min) && !isNaN(max)) {
+              finalRange = [min, max];
+            }
+          }
+
           return {
             ...item,
             fnType,
@@ -128,12 +142,7 @@ export default function MathGraph({ code }: { code: string }) {
             color: item.color || LEGEND_COLORS[index % LEGEND_COLORS.length],
             label: item.label || item.fn || `Function ${index + 1}`,
             vector: item.vector ? [item.vector[0], item.vector[1]] : undefined,
-            range:
-              fnType !== "implicit" &&
-              Array.isArray(item.range) &&
-              item.range.length === 2
-                ? [item.range[0], item.range[1]]
-                : undefined,
+            range: finalRange,
           };
         });
 
