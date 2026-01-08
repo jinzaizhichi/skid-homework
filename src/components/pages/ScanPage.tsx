@@ -118,6 +118,16 @@ export default function ScanPage() {
           return true;
         }
 
+        if (
+          f.type.startsWith("text/") ||
+          f.type === "application/json" ||
+          f.name.endsWith(".md") ||
+          f.name.endsWith(".json") ||
+          f.name.endsWith(".txt")
+        ) {
+          return true;
+        }
+
         if (f.type === "application/pdf") {
           if (allowPdfUploads) {
             return true;

@@ -165,7 +165,7 @@ export default function ActiveSolutionContent({
           <div className="flex items-center justify-between mb-2">
             <div className="text-xs text-slate-400">
               {t("photo-label", {
-                fileName: entry.item.displayName,
+                index: entry.item.displayName,
                 source: entry.item.source,
               })}
             </div>
