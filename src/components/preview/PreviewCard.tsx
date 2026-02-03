@@ -1,16 +1,12 @@
-/* eslint-disable @next/next/no-img-element */
 import "react-photo-view/dist/react-photo-view.css";
-import { Trash2, X } from "lucide-react";
-import { PhotoProvider, PhotoView } from "react-photo-view";
+import { Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { ScrollArea } from "../ui/scroll-area";
-import { Badge } from "../ui/badge";
-import { twMerge } from "tailwind-merge";
-import type { FileItem, FileStatus } from "@/store/problems-store";
+import type { FileItem } from "@/store/problems-store";
 import { useCallback, useState, type ClipboardEvent } from "react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import EmptyPreviewArea from "./EmptyPreviewArea";
+import PreviewList from "./PreviewList";
 
 export type PreviewCardProps = {
   items: FileItem[];
@@ -19,19 +15,6 @@ export type PreviewCardProps = {
   layout?: "default" | "mobile";
 };
 
-function getColorClassByStatus(status: FileStatus) {
-  switch (status) {
-    case "success":
-      return "border-green-500";
-    case "failed":
-      return "border-red-500";
-    case "pending":
-      return "border-amber-500";
-    case "processing":
-      return "border-cyan-500";
-  }
-}
-
 export default function PreviewCard({
   items,
   removeItem,
@@ -39,7 +22,6 @@ export default function PreviewCard({
   layout = "default",
 }: PreviewCardProps) {
   const { t } = useTranslation("commons", { keyPrefix: "preview" });
-  const { t: tCommon } = useTranslation("commons");
 
   const [isDragging, setIsDragging] = useState(false);
   const isMobileLayout = layout === "mobile";
@@ -102,106 +84,12 @@ export default function PreviewCard({
               onDrop={onDrop}
             />
           ) : (
-            <PhotoProvider>
-              {isMobileLayout ? (
-                <div className="-mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-2">
-                  {items.map((it) => (
-                    <figure
-                      key={it.id}
-                      className={twMerge(
-                        "group relative flex h-64 min-w-[72vw] flex-col overflow-hidden rounded-2xl border border-white/15 bg-background/80 shadow-sm",
-                        getColorClassByStatus(it.status),
-                      )}
-                      onDrop={onDrop}
-                    >
-                      {it.mimeType.startsWith("image/") ? (
-                        <PhotoView src={it.url}>
-                          <img
-                            src={it.url}
-                            alt={t("image-alt")}
-                            className="h-48 w-full cursor-pointer object-cover"
-                          />
-                        </PhotoView>
-                      ) : (
-                        <div className="flex h-48 w-full select-none items-center justify-center text-sm">
-                          {it.mimeType === "application/pdf"
-                            ? t("file-type.pdf")
-                            : t("file-type.unknown")}
-                        </div>
-                      )}
-                      <figcaption className="flex items-center justify-between px-4 py-3 text-xs text-slate-200">
-                        <span className="truncate pr-2" title={it.file.name}>
-                          {it.file.name}
-                        </span>
-                        <Badge variant="outline" className="border-white/20">
-                          {tCommon(`sources.${it.source}`)}
-                        </Badge>
-                      </figcaption>
-                      <button
-                        className="absolute right-3 top-3 rounded-full bg-black/40 p-2 text-white/90 backdrop-blur transition hover:bg-black/60"
-                        onClick={() => removeItem(it.id)}
-                        aria-label={t("remove-aria")}
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </figure>
-                  ))}
-                </div>
-              ) : (
-                <ScrollArea className="rounded-lg">
-                  <div
-                    className={cn(
-                      "grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4",
-                      isDragging
-                        ? "border-indigo-400 bg-indigo-500/10"
-                        : "border-white/15",
-                    )}
-                    onDrop={onDrop}
-                  >
-                    {items.map((it) => (
-                      <figure
-                        key={it.id}
-                        className={twMerge(
-                          "group relative overflow-hidden rounded-xl border border-white/10",
-                          getColorClassByStatus(it.status),
-                        )}
-                      >
-                        {it.mimeType.startsWith("image/") ? (
-                          <PhotoView src={it.url}>
-                            <img
-                              src={it.url}
-                              alt={t("image-alt")}
-                              className="h-40 w-full cursor-pointer object-cover"
-                            />
-                          </PhotoView>
-                        ) : (
-                          <div className="flex h-40 w-full select-none items-center justify-center">
-                            {it.mimeType === "application/pdf"
-                              ? t("file-type.pdf")
-                              : t("file-type.unknown")}
-                          </div>
-                        )}
-                        <figcaption className="flex items-center justify-between px-3 py-2 text-xs text-slate-300">
-                          <span className="truncate" title={it.file.name}>
-                            {it.file.name}
-                          </span>
-                          <Badge variant="outline" className="border-white/20">
-                            {tCommon(`sources.${it.source}`)}
-                          </Badge>
-                        </figcaption>
-                        <button
-                          className="absolute right-2 top-2 hidden rounded-md bg-black/40 p-1 text-white/90 backdrop-blur transition group-hover:block"
-                          onClick={() => removeItem(it.id)}
-                          aria-label={t("remove-aria")}
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </figure>
-                    ))}
-                  </div>
-                </ScrollArea>
-              )}
-            </PhotoProvider>
+            <PreviewList
+              isDragging={isDragging}
+              onDrop={onDrop}
+              layout={layout}
+              removeItem={removeItem}
+            />
           )}
 
           {isDragging && !isMobileLayout && (
