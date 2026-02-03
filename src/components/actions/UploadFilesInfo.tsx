@@ -1,4 +1,4 @@
-import { Badge } from "./ui/badge";
+import { Badge } from "../ui/badge";
 import { useTranslation } from "react-i18next";
 
 function bytesToReadable(size: number) {
@@ -16,7 +16,10 @@ export type InfoAreaProps = {
   totalBytes: number;
 };
 
-export default function InfoArea({ itemsLength, totalBytes }: InfoAreaProps) {
+export default function UploadFilesInfo({
+  itemsLength,
+  totalBytes,
+}: InfoAreaProps) {
   const { t } = useTranslation("commons", { keyPrefix: "uploads-info" });
   return (
     <div className="flex items-center justify-between text-sm">

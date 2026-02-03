@@ -1,11 +1,11 @@
 import { useSettingsStore } from "@/store/settings-store";
 import { useState, type ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "./ui/button";
-import { TextInputDialog } from "./dialogs/TextInputDialog";
+import { Button } from "../ui/button";
+import { TextInputDialog } from "../dialogs/TextInputDialog";
 import { cn } from "@/lib/utils";
 import { useShortcut } from "@/hooks/use-shortcut";
-import { ShortcutHint } from "./ShortcutHint";
+import { ShortcutHint } from "../ShortcutHint";
 
 export type GlobalTraitsEditorProps = {} & ComponentProps<"button">;
 

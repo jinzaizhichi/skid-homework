@@ -1,11 +1,11 @@
 import { ExplanationMode } from "@/store/settings-store";
 import { useTranslation } from "react-i18next";
-import { MemoizedMarkdown } from "./markdown/MarkdownRenderer";
+import { MemoizedMarkdown } from "../markdown/MarkdownRenderer";
 import { ExplanationStep } from "@/store/problems-store";
 import { useMemo, useState } from "react";
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
-import { Kbd } from "./ui/kbd";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
+import { Kbd } from "../ui/kbd";
 import { useHotkeys } from "react-hotkeys-hook";
 
 export type ExplanationProps = {

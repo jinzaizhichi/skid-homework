@@ -1,5 +1,5 @@
 import { useProblemsStore } from "@/store/problems-store";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useTranslation } from "react-i18next";
 import { OrderedSolution } from "@/hooks/use-solution-export";
 

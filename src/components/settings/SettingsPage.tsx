@@ -22,7 +22,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import ShortcutRecorder from "../ShortcutRecorder";
+import ShortcutRecorder from "./ShortcutRecorder";
 import { useTheme } from "../theme-provider";
 import { Button } from "../ui/button";
 import {

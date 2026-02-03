@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useShortcut } from "@/hooks/use-shortcut";
 import { ShortcutHint } from "../ShortcutHint";
-import GlobalTraitsEditor from "../GlobalTraitsEditor";
+import GlobalTraitsEditor from "./GlobalTraitsEditor";
 
 export type ActionsAreaProps = {
   startScan: () => Promise<void>;

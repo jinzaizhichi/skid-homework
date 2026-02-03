@@ -1,11 +1,11 @@
 import type { FileItem } from "@/store/problems-store";
 import { useCallback } from "react";
-import ActionsArea from "../areas/ActionsArea";
-import InfoArea from "../UploadsInfo";
+import ActionsArea from "./ActionsArea";
+import UploadFilesInfo from "./UploadFilesInfo";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Separator } from "../ui/separator";
-import UploadArea from "../areas/UploadArea";
+import UploadArea from "./UploadArea";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -82,7 +82,7 @@ export default function ActionsCard({
 
         <Separator className="my-2" />
 
-        <InfoArea itemsLength={items.length} totalBytes={totalBytes} />
+        <UploadFilesInfo itemsLength={items.length} totalBytes={totalBytes} />
 
         <ActionsArea
           itemsLength={items.length}

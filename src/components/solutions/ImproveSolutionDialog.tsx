@@ -9,7 +9,7 @@ import { renderImproveXml } from "@/ai/request";
 import { uint8ToBase64 } from "@/utils/encoding";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { TextInputDialog } from "./TextInputDialog";
+import { TextInputDialog } from "../dialogs/TextInputDialog";
 
 import improvePrompt from "../../ai/prompts/improve.prompt.md";
 import { getEnabledToolCallingPrompts } from "@/ai/prompts/prompt-manager";
