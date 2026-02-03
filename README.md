@@ -44,6 +44,7 @@ Skid-Homework 不会要求你下载桌面软件, 一切东西都在浏览器内�
 - 支持解析多张图片/PDF 文件
 - 左撇子友好
 - 支持输出图片 ([支持情况](#画图工具支持情况))
+- 支持持久化解析
 
 ## 现在尝试
 
@@ -78,9 +79,12 @@ Skid-Homework 不会要求你下载桌面软件, 一切东西都在浏览器内�
 
 ### 画图工具支持情况
 
+> 注: 部分 AI 有时会输出错误的工具调用, 若遇到问题请反馈
+
 - [JSXGraph](https://github.com/jsxgraph/jsxgraph) (unstable)
 - [Mermaid](https://mermaid.js.org/)
-- [function-plot](https://github.com/mauriciopoppe/function-plot) (逐步弃用, 后续将替换为 JSXGraph)
+- [function-plot](https://github.com/mauriciopoppe/function-plot)
+  (逐步弃用, 后续将替换为 JSXGraph)
 - [SVG](https://www.w3.org/Graphics/SVG/)
 
 ### 为什么如此之慢
