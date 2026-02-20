@@ -280,6 +280,10 @@ interface Resources {
           "description": "要处理 PDF，请启用 Gemini 源。",
           "title": "PDF 上传已禁用"
         },
+        "post-processing": {
+          "description": "AI 需要一点时间来处理你的作业，请稍等片刻。",
+          "title": "正在处理中......"
+        },
         "unsupported-file": {
           "description": "您的文件MIME 类型为 {{mimeType}}, 当前不被 SkidHomework 支持",
           "title": "不支持的文件类型"
