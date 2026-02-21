@@ -80,14 +80,13 @@ export default function ScanPage() {
   const [activeTab, setActiveTab] = useState<"capture" | "preview">(
     items.length ? "preview" : "capture",
   );
-
   useShortcut(
-    "openChat",
-    (event) => {
-      event.preventDefault();
-      router.push("/chat");
-    },
-    [router],
+      "openChat",
+      (event) => {
+        event.preventDefault();
+        router.push("/chat");
+      },
+      [router],
   );
 
   useEffect(() => {
@@ -95,13 +94,6 @@ export default function ScanPage() {
       setActiveTab("capture");
     }
   }, [items.length]);
-
-  // Effect hook to clean up object URLs when the component unmounts or items change.
-  useEffect(() => {
-    return () => {
-      items.forEach((it) => URL.revokeObjectURL(it.url));
-    };
-  }, [items]);
 
   // Memoized calculation of the total size of all uploaded files.
   const totalBytes = useMemo(

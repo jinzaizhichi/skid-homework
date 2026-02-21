@@ -22,6 +22,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import ShortcutRecorder from "./ShortcutRecorder";
 import { useTheme } from "../theme-provider";
 import { Button } from "../ui/button";
@@ -80,6 +81,7 @@ export default function SettingsPage() {
   const { t, i18n } = useTranslation("commons", {
     keyPrefix: "settings-page",
   });
+  const isCompact = useMediaQuery("(max-width: 640px)");
 
   const searchParams = useSearchParams();
 
@@ -228,32 +230,39 @@ export default function SettingsPage() {
         label: translateSettings("shortcuts.actions.camera.label"),
         description: translateSettings("shortcuts.actions.camera.description"),
       },
+      !isCompact && {
+        action: "adbScreenshot" as ShortcutAction,
+        label: translateSettings("shortcuts.actions.adb-screenshot.label"),
+        description: translateSettings(
+          "shortcuts.actions.adb-screenshot.description",
+        ),
+      },
       {
         action: "startScan" as ShortcutAction,
-        label: translateSettings("shortcuts.actions.startScan.label"),
+        label: translateSettings("shortcuts.actions.start-scan.label"),
         description: translateSettings(
-          "shortcuts.actions.startScan.description",
+          "shortcuts.actions.start-scan.description",
         ),
       },
       {
         action: "clearAll" as ShortcutAction,
-        label: translateSettings("shortcuts.actions.clearAll.label"),
+        label: translateSettings("shortcuts.actions.clear-all.label"),
         description: translateSettings(
-          "shortcuts.actions.clearAll.description",
+          "shortcuts.actions.clear-all.description",
         ),
       },
       {
         action: "openSettings" as ShortcutAction,
-        label: translateSettings("shortcuts.actions.openSettings.label"),
+        label: translateSettings("shortcuts.actions.open-settings.label"),
         description: translateSettings(
-          "shortcuts.actions.openSettings.description",
+          "shortcuts.actions.open-settings.description",
         ),
       },
       {
         action: "openChat" as ShortcutAction,
-        label: translateSettings("shortcuts.actions.openChat.label"),
+        label: translateSettings("shortcuts.actions.open-chat.label"),
         description: translateSettings(
-          "shortcuts.actions.openChat.description",
+          "shortcuts.actions.open-chat.description",
         ),
       },
       {
@@ -265,8 +274,12 @@ export default function SettingsPage() {
           "shortcuts.actions.open-global-traits-editor.description",
         ),
       },
-    ];
-  }, [translateSettings]);
+    ].filter(Boolean) as Array<{
+      action: ShortcutAction;
+      label: string;
+      description: string;
+    }>;
+  }, [translateSettings, isCompact]);
 
   const shortcutsTitle = translateSettings("shortcuts.title");
   const shortcutsDesc = translateSettings("shortcuts.desc");

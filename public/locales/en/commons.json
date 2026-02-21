@@ -231,7 +231,21 @@
       ],
       "close": "Got it"
     },
-    "pdf-disabled": "PDF uploads are available only when a Gemini source is enabled."
+    "pdf-disabled": "PDF uploads are available only when a Gemini source is enabled.",
+    "adb": {
+      "connect": "ADB Connect",
+      "reconnect": "Reconnect ADB",
+      "screenshot": "ADB Screenshot",
+      "connecting": "Connecting...",
+      "screenshot-busy": "Capturing...",
+      "screenshot-hint": "Capture a screenshot from a connected Android device via ADB (WebUSB)",
+      "menu-aria-label": "ADB Menu",
+      "capture-timeout": "ADB screenshot timed out. Please check the connection and try again."
+    },
+    "toasts": {
+      "adb-failed": "Something went wrong with ADB: {{error}}",
+      "webusb-not-supported": "WebUSB is not supported in this browser."
+    }
   },
   "uploads-info": {
     "selected": "Selected"
@@ -347,19 +361,23 @@
           "label": "Take photo",
           "description": "Launches the device camera to capture homework."
         },
-        "startScan": {
+        "adb-screenshot": {
+          "label": "ADB screenshot",
+          "description": "Capture the connected Android device's screen via ADB."
+        },
+        "start-scan": {
           "label": "Start scan",
           "description": "Sends all pending items to your AI sources."
         },
-        "clearAll": {
+        "clear-all": {
           "label": "Clear all",
           "description": "Removes every uploaded item and solution."
         },
-        "openSettings": {
+        "open-settings": {
           "label": "Open settings",
           "description": "Opens this settings page from anywhere in the app."
         },
-        "openChat": {
+        "open-chat": {
           "label": "Open chat",
           "description": "Jump straight to the chat workspace."
         },
@@ -604,6 +622,7 @@
   },
   "sources": {
     "upload": "Upload",
-    "camera": "Camera"
+    "camera": "Camera",
+    "adb": "ADB"
   }
 }

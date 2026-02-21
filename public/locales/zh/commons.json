@@ -65,6 +65,10 @@
       }
     },
     "toasts": {
+      "post-processing": {
+        "title": "正在处理中......",
+        "description": "AI 需要一点时间来处理你的作业，请稍等片刻。"
+      },
       "no-model": {
         "title": "需要模型",
         "description": "请先在设置中为 {{provider}} 选择模型。"
@@ -227,7 +231,21 @@
       ],
       "close": "知道了"
     },
-    "pdf-disabled": "仅在启用 Gemini 源时支持 PDF 上传。"
+    "pdf-disabled": "仅在启用 Gemini 源时支持 PDF 上传。",
+    "adb": {
+      "connect": "ADB 连接",
+      "reconnect": "重新连接 ADB",
+      "screenshot": "ADB 截图",
+      "connecting": "连接中...",
+      "screenshot-busy": "采集中...",
+      "screenshot-hint": "通过 ADB（WebUSB）从已连接的安卓设备捕获屏幕截图",
+      "menu-aria-label": "ADB 操作菜单",
+      "capture-timeout": "ADB 截图超时，请检查连接"
+    },
+    "toasts": {
+      "adb-failed": "ADB 处理发生异常：{{error}}",
+      "webusb-not-supported": "该浏览器不支持 WebUSB。"
+    }
   },
   "uploads-info": {
     "selected": "已选择"
@@ -285,7 +303,7 @@
         "success": "已添加 {{name}}。",
         "key": "API 密钥",
         "key-placeholder": "abcdef",
-        "address": "API 地址 (可选)"
+        "address": "API 地址 （可选）"
       },
       "make-active": "设为当前配置",
       "remove": {
@@ -343,19 +361,23 @@
           "label": "拍照",
           "description": "调用设备相机拍摄作业。"
         },
-        "startScan": {
+        "adb-screenshot": {
+          "label": "ADB 截图",
+          "description": "通过 ADB 直接截取已连接安卓设备的屏幕。"
+        },
+        "start-scan": {
           "label": "开始识别",
           "description": "将所有待处理的文件发送给 AI 源。"
         },
-        "clearAll": {
+        "clear-all": {
           "label": "清空全部",
           "description": "移除所有已上传的文件与结果。"
         },
-        "openSettings": {
+        "open-settings": {
           "label": "打开设置",
           "description": "从任意页面快速进入设置。"
         },
-        "openChat": {
+        "open-chat": {
           "label": "打开聊天",
           "description": "随时切换到聊天工作区。"
         },
@@ -604,6 +626,7 @@
   },
   "sources": {
     "upload": "本地上传",
-    "camera": "拍摄"
+    "camera": "拍摄",
+    "adb": "ADB"
   }
 }
