@@ -14,21 +14,20 @@ export default function RequireAiKey({
   const hasKey = useHasActiveAiKey();
   const router = useRouter();
   const pathname = usePathname();
-  const [hydrated, setHydrated] = useState(false);
+
+  const [hydrated, setHydrated] = useState(() => {
+    return useAiStore.persist?.hasHydrated?.() ?? false;
+  });
 
   useEffect(() => {
-    const alreadyHydrated = useAiStore.persist?.hasHydrated?.();
-    if (alreadyHydrated) {
-      setHydrated(true);
-      return;
-    }
+    if (hydrated) return;
 
     const unsub = useAiStore.persist?.onFinishHydration?.(() => {
       setHydrated(true);
     });
 
     return () => unsub?.();
-  }, []);
+  }, [hydrated]);
 
   useEffect(() => {
     if (!hydrated || hasKey || pathname === fallback) return;

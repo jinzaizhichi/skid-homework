@@ -190,12 +190,14 @@ export default function SettingsPage() {
       setAvailableModels([]);
       return;
     }
+
     try {
       const client = getClientForSource(activeSource.id);
       if (!client?.getAvailableModels) {
         setAvailableModels([]);
         return;
       }
+
       const models = await client.getAvailableModels();
       setAvailableModels(models);
     } catch (error) {
@@ -210,7 +212,11 @@ export default function SettingsPage() {
   }, [activeSource, getClientForSource, t]);
 
   useEffect(() => {
-    loadModels();
+    const execute = async () => {
+      await loadModels();
+    };
+
+    execute();
   }, [loadModels]);
 
   const translateSettings = useCallback(
@@ -326,7 +332,10 @@ export default function SettingsPage() {
 
         <AISourceManager />
 
-        <AIAPICredentialsManager activeSource={activeSource} />
+        <AIAPICredentialsManager
+          key={activeSource.id}
+          activeSource={activeSource}
+        />
 
         <Card>
           <CardHeader>

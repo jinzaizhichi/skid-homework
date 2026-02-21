@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DEFAULT_BASE_BY_PROVIDER } from "./SettingsPage";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AiSource, useAiStore } from "@/store/ai-store";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -33,15 +33,6 @@ export default function AIAPICredentialsManager({
   );
 
   const updateSource = useAiStore((s) => s.updateSource);
-
-  useEffect(() => {
-    setLocalName(activeSource?.name ?? "");
-    setLocalApiKey(activeSource?.apiKey ?? "");
-    setLocalBaseUrl(
-      activeSource?.baseUrl ??
-        (activeSource ? DEFAULT_BASE_BY_PROVIDER[activeSource.provider] : ""),
-    );
-  }, [activeSource]);
 
   const handleNameBlur = () => {
     if (!activeSource) return;

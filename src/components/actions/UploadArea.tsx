@@ -308,7 +308,7 @@ export default function UploadArea({ appendFiles, allowPdf }: UploadAreaProps) {
                   <MoreVertical className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[10rem]">
+              <DropdownMenuContent align="end" className="min-w-40">
                 <DropdownMenuItem onClick={handleAdbReconnect}>
                   {t("adb.reconnect")}
                 </DropdownMenuItem>

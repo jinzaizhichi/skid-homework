@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import { Sparkles, ShieldCheck, Camera, Rocket } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -41,11 +41,6 @@ export default function InitPage() {
   const [baseUrl, setBaseUrl] = useState<string | undefined>(
     activeSource?.baseUrl,
   );
-
-  useEffect(() => {
-    setKey(activeSource?.apiKey ?? "");
-    setBaseUrl(activeSource?.baseUrl);
-  }, [activeSource]);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -91,8 +86,8 @@ export default function InitPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b">
-      <div className="pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]">
+    <div className="relative min-h-screen overflow-hidden bg-linear-to-b">
+      <div className="pointer-events-none absolute inset-0 mask-[radial-gradient(ellipse_at_center,black,transparent_70%)]">
         <svg
           className="absolute inset-0 h-full w-full opacity-[0.12]"
           xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +132,7 @@ export default function InitPage() {
               transition={{ duration: 0.6 }}
               className="text-balance text-4xl font-bold leading-tight tracking-tight md:text-5xl"
             >
-              <span className="bg-gradient-to-r from-indigo-300 via-slate-500 dark:via-white to-fuchsia-300 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-indigo-300 via-slate-500 dark:via-white to-fuchsia-300 bg-clip-text text-transparent">
                 {t("headline.highlight")}
               </span>
               <br />
@@ -319,7 +314,7 @@ export default function InitPage() {
                 <Camera className="h-5 w-5" />
                 <span className="text-sm">{t("preview.title")}</span>
               </div>
-              <div className="aspect-[16/10] w-full rounded-xl bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/20 ring-1 ring-white/10" />
+              <div className="aspect-16/10 w-full rounded-xl bg-linear-to-br from-indigo-500/20 to-fuchsia-500/20 ring-1 ring-white/10" />
               <div className="mt-4 grid grid-cols-3 gap-3 text-xs text-slate-300">
                 <div className="rounded-lg border border-white/10 bg-slate-950/40 p-3">
                   {t("preview.ocr")}
