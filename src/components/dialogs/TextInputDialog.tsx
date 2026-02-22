@@ -44,12 +44,12 @@ export const TextInputDialog = ({
   const [inputValue, setInputValue] = useState(initialValue ?? "");
 
   const handleSubmit = () => {
-    onSubmit(inputValue);
+    onSubmit(inputValue.trim());
     setInputValue("");
   };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
-    if (e.ctrlKey && e.key === "Enter" && (allowEmpty || inputValue)) {
+    if (e.ctrlKey && e.key === "Enter" && (allowEmpty || inputValue.trim())) {
       e.preventDefault();
       onOpenChange?.(false);
       handleSubmit();
@@ -77,7 +77,7 @@ export const TextInputDialog = ({
               type="button"
               variant="secondary"
               onClick={handleSubmit}
-              disabled={!(inputValue || allowEmpty) || isSubmitting}
+              disabled={!(inputValue.trim() || allowEmpty) || isSubmitting}
             >
               {isSubmitting && <Loader2 className="animate-spin mr-2" />}
               {submitText} <Kbd>Ctrl+Enter</Kbd>
