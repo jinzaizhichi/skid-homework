@@ -32,6 +32,8 @@ export default function PreviewCard({
 
   const [isDragging, setIsDragging] = useState(false);
   const dragCounter = useRef(0);
+  // use drag counter to handle drag enter and leave events correctly when dragging over child elements
+  //
   const isMobileLayout = layout === "mobile";
 
   const onDragEnter = useCallback(
