@@ -1,53 +1,40 @@
 "use client";
 
-import { useQwenHintAutoToggle } from "@/hooks/useQwenHintAutoToggle";
-import { cn } from "@/lib/utils";
+import {useQwenHintAutoToggle} from "@/hooks/useQwenHintAutoToggle";
+import {cn} from "@/lib/utils";
 import {
+  type AiModelSummary,
+  type AiProvider,
   DEFAULT_GEMINI_BASE_URL,
   DEFAULT_OPENAI_BASE_URL,
   useAiStore,
-  type AiModelSummary,
-  type AiProvider,
 } from "@/store/ai-store";
 import {
-  useSettingsStore,
   type LanguagePreference,
   type ShortcutAction,
   type ThemePreference,
+  useSettingsStore,
 } from "@/store/settings-store";
-import { Check, ChevronsUpDown } from "lucide-react";
+import {Check, ChevronsUpDown} from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import {useRouter, useSearchParams} from "next/navigation";
+import {useCallback, useEffect, useMemo, useState} from "react";
+import {useHotkeys} from "react-hotkeys-hook";
+import {useTranslation} from "react-i18next";
+import {toast} from "sonner";
+import {useMediaQuery} from "@/hooks/use-media-query";
 import ShortcutRecorder from "./ShortcutRecorder";
-import { useTheme } from "../theme-provider";
-import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { Checkbox } from "../ui/checkbox";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
-import { Input } from "../ui/input";
-import { Kbd } from "../ui/kbd";
-import { Label } from "../ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Slider } from "../ui/slider";
-import { Textarea } from "../ui/textarea";
+import {useTheme} from "../theme-provider";
+import {Button} from "../ui/button";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "../ui/card";
+import {Checkbox} from "../ui/checkbox";
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,} from "../ui/command";
+import {Input} from "../ui/input";
+import {Kbd} from "../ui/kbd";
+import {Label} from "../ui/label";
+import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
+import {Slider} from "../ui/slider";
+import {Textarea} from "../ui/textarea";
 import AIAPICredentialsManager from "./AIAPICredentialsManager";
 import AISourceManager from "./AISourceManager";
 import ExplanationModeSelector from "./ExplanationModeSelector";
@@ -111,6 +98,8 @@ export default function SettingsPage() {
   } = useSettingsStore((s) => s);
 
   const { theme: activeTheme, setTheme } = useTheme();
+
+  const [recordingAction, setRecordingAction] = useState<ShortcutAction | null>(null);
 
   const activeSource = useMemo(
     () => sources.find((source) => source.id === activeSourceId) ?? sources[0],
@@ -418,6 +407,10 @@ export default function SettingsPage() {
                 <ShortcutRecorder
                   value={keybindings[item.action] ?? ""}
                   onChange={(combo) => setKeybinding(item.action, combo)}
+                  isRecording={recordingAction === item.action}
+                  onRecordingChange={(recording) => {
+                    setRecordingAction(recording ? item.action : null);
+                  }}
                 />
               </div>
             ))}

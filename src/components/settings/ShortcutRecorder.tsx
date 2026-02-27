@@ -1,22 +1,26 @@
-import { useEffect, useState } from "react";
-import { Button } from "../ui/button";
-import {
-  formatShortcutLabel,
-  buildShortcutFromKeyboardEvent,
-} from "@/utils/shortcuts";
-import { useTranslation } from "react-i18next";
+import {useEffect, useState} from "react";
+import {Button} from "../ui/button";
+import {buildShortcutFromKeyboardEvent, formatShortcutLabel,} from "@/utils/shortcuts";
+import {useTranslation} from "react-i18next";
 
 export interface ShortcutRecorderProps {
   value: string;
   onChange: (value: string) => void;
+  isRecording?: boolean;
+  onRecordingChange?: (recording: boolean) => void;
 }
 
 export default function ShortcutRecorder({
   value,
   onChange,
+  isRecording,
+  onRecordingChange,
 }: ShortcutRecorderProps) {
   const { t } = useTranslation("commons");
-  const [recording, setRecording] = useState(false);
+  const [internalRecording, setInternalRecording] = useState(false);
+  const recording = isRecording !== undefined ? isRecording : internalRecording;
+  const setRecording = onRecordingChange || setInternalRecording;
+
   const recordingLabel = t("settings-page.shortcuts.recording");
   const unassignedLabel = t("settings-page.shortcuts.unassigned");
   const clearLabel = t("settings-page.shortcuts.clear");
@@ -24,12 +28,20 @@ export default function ShortcutRecorder({
   useEffect(() => {
     if (!recording) return;
 
-    const handleKeyUp = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       event.preventDefault();
       event.stopPropagation();
 
       if (event.key === "Escape") {
         setRecording(false);
+      }
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (event.key === "Escape") {
         return;
       }
 
@@ -40,10 +52,13 @@ export default function ShortcutRecorder({
       setRecording(false);
     };
 
+    window.addEventListener("keydown", handleKeyDown, { capture: true });
     window.addEventListener("keyup", handleKeyUp, { capture: true });
-    return () =>
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown, { capture: true });
       window.removeEventListener("keyup", handleKeyUp, { capture: true });
-  }, [recording, onChange]);
+    };
+  }, [recording, onChange, setRecording]);
 
   const label = formatShortcutLabel(value);
 
@@ -57,7 +72,7 @@ export default function ShortcutRecorder({
           if (recording) e.stopPropagation();
         }}
         onClick={() => {
-          setRecording((prev) => !prev);
+          setRecording(!recording);
         }}
       >
         {recording ? recordingLabel : label || unassignedLabel}
