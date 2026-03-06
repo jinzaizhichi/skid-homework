@@ -31,22 +31,9 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import ShortcutRecorder from "./ShortcutRecorder";
 import { useTheme } from "../theme-provider";
 import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Checkbox } from "../ui/checkbox";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
 import { Input } from "../ui/input";
 import { Kbd } from "../ui/kbd";
 import { Label } from "../ui/label";
@@ -102,6 +89,12 @@ export default function SettingsPage() {
     setImageEnhancement: setImageEnhancement,
     showQwenHint,
     setShowQwenHint,
+    onlineSearchEnabled,
+    setOnlineSearchEnabled,
+    showModelSelectorInScanner,
+    setShowModelSelectorInScanner,
+    showOnlineSearchInScanner,
+    setShowOnlineSearchInScanner,
     theme: themePreference,
     setThemePreference,
     language,
@@ -500,6 +493,20 @@ export default function SettingsPage() {
               </Button>
             </div>
             <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id="show-model-selector"
+                  checked={showModelSelectorInScanner}
+                  onCheckedChange={(state) =>
+                    setShowModelSelectorInScanner(Boolean(state))
+                  }
+                />
+                <Label htmlFor="show-model-selector">
+                  {t("model.show-selector-in-scanner")}
+                </Label>
+              </div>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="model-manual">{t("model.manual.title")}</Label>
               <Input
                 id="model-manual"
@@ -557,6 +564,44 @@ export default function SettingsPage() {
                 </div>
               </div>
             )}
+
+            <div className="space-y-2">
+              <Label htmlFor="online-search-toggle">
+                {t("thinking.online-search.title")}
+              </Label>
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id="online-search-toggle"
+                  checked={onlineSearchEnabled}
+                  onCheckedChange={(state) =>
+                    setOnlineSearchEnabled(state === true)
+                  }
+                />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">
+                    {t("thinking.online-search.toggle")}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("thinking.online-search.desc")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id="show-online-search-scanner"
+                  checked={showOnlineSearchInScanner}
+                  onCheckedChange={(state) =>
+                    setShowOnlineSearchInScanner(state === true)
+                  }
+                />
+                <Label htmlFor="show-online-search-scanner">
+                  {t("thinking.online-search.show-toggle-in-scanner")}
+                </Label>
+              </div>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="traits-input">{t("traits.title")}</Label>
@@ -629,7 +674,7 @@ export default function SettingsPage() {
                 id="clear-dialog-on-submit"
                 checked={clearDialogOnSubmit}
                 onCheckedChange={(state) =>
-                  setClearDialogOnSubmit(Boolean(state))
+                  setClearDialogOnSubmit(state === true)
                 }
               />
               <Label htmlFor="clear-dialog-on-submit">

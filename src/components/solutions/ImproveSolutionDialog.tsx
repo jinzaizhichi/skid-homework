@@ -1,8 +1,8 @@
 import { Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Kbd } from "../ui/kbd";
-import { useProblemsStore, type ProblemSolution } from "@/store/problems-store";
-import { parseImproveResponse, type ImproveResponse } from "@/ai/response";
+import { type ProblemSolution, useProblemsStore } from "@/store/problems-store";
+import { type ImproveResponse, parseImproveResponse } from "@/ai/response";
 import { useAiStore } from "@/store/ai-store";
 import { forwardRef, useImperativeHandle, useMemo, useState } from "react";
 import { renderImproveXml } from "@/ai/request";
@@ -14,6 +14,7 @@ import { TextInputDialog } from "../dialogs/TextInputDialog";
 import improvePrompt from "../../ai/prompts/improve.prompt.md";
 import { getEnabledToolCallingPrompts } from "@/ai/prompts/prompt-manager";
 import { OrderedSolution } from "@/hooks/use-solution-export";
+import { useSettingsStore } from "@/store/settings-store";
 
 export type ImproveSolutionDialogProps = {
   entry: OrderedSolution;
@@ -56,6 +57,7 @@ export const ImproveSolutionDialog = forwardRef<
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isImproving, setImproving] = useState(false);
+  const onlineSearchEnabled = useSettingsStore((s) => s.onlineSearchEnabled);
 
   const handleImproveSolution = async (improveSolutionPrompt: string) => {
     if (!activeProblem) return;
@@ -110,11 +112,15 @@ ${source.traits}
           clearStreamedOutput(entry.item.id);
 
           const resText = await aiClient.sendMedia(
-            base64,
-            entry.item.mimeType,
+            {
+              data: base64,
+              mimeType: entry.item.mimeType,
+              name: entry.item.displayName,
+            },
             prompt,
             source.model,
             (text) => appendStreamedOutput(entry.item.id, text),
+            { onlineSearch: onlineSearchEnabled },
           );
 
           const res = parseImproveResponse(resText);

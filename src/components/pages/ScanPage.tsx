@@ -2,7 +2,7 @@
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { Info, StarIcon } from "lucide-react";
-import { useEffect, useMemo, useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAiStore } from "@/store/ai-store";
 import ActionsCard from "../actions/ActionsCard";
 import PreviewCard from "../preview/PreviewCard";
@@ -12,11 +12,7 @@ import solvePrompt from "@/ai/prompts/solve.prompt.md";
 import { uint8ToBase64 } from "@/utils/encoding";
 import { parseSolveResponse } from "@/ai/response";
 
-import {
-  useProblemsStore,
-  type FileItem as FileItem,
-  type ProblemSolution,
-} from "@/store/problems-store";
+import { type FileItem as FileItem, type ProblemSolution, useProblemsStore } from "@/store/problems-store";
 import SolutionsArea from "../solutions/SolutionsArea";
 import { useSettingsStore } from "@/store/settings-store";
 import { processImage } from "@/utils/image-post-processing";
@@ -31,6 +27,7 @@ import OpenCVLoader from "../OpenCVLoader";
 import { getEnabledToolCallingPrompts } from "@/ai/prompts/prompt-manager";
 import { useStoreInitialization } from "@/hooks/use-store-initialization";
 import { isTextMimeType } from "@/utils/file-utils";
+import { isNonRetryableError } from "@/ai/errors";
 
 export default function ScanPage() {
   const { t } = useTranslation("commons", { keyPrefix: "scan-page" });
@@ -53,7 +50,9 @@ export default function ScanPage() {
   } = useProblemsStore((s) => s);
   const isStoreReady = useStoreInitialization();
 
-  const { imageEnhancement, traits } = useSettingsStore((s) => s);
+  const { imageEnhancement, traits, onlineSearchEnabled } = useSettingsStore(
+    (s) => s,
+  );
 
   // Zustand store for AI provider configuration.
   const sources = useAiStore((state) => state.sources);
@@ -206,7 +205,6 @@ export default function ScanPage() {
     clearAllSolutions(); // Use the semantic action to clear solutions.
   };
 
-  // Utility function to retry an async operation with exponential backoff.
   const retryAsyncOperation = async (
     asyncFn: () => Promise<string>,
     maxRetries: number = 5,
@@ -217,21 +215,24 @@ export default function ScanPage() {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        return await asyncFn(); // Attempt the operation.
+        return await asyncFn();
       } catch (error) {
         lastError = error as Error;
+
+        if (isNonRetryableError(error)) {
+          throw error;
+        }
+
         console.log(
           `Attempt ${attempt} failed. Retrying in ${delay / 1000}s...`,
         );
 
         if (attempt < maxRetries) {
-          // Wait for the delay period before the next attempt.
           await new Promise((resolve) => setTimeout(resolve, delay));
-          delay *= 2; // Double the delay for the next retry (exponential backoff).
+          delay *= 2;
         }
       }
     }
-    // If all retries fail, throw the last captured error.
     throw lastError ?? new Error("Unknown AI failure");
   };
 
@@ -283,11 +284,7 @@ export default function ScanPage() {
       (item) => item.mimeType === "application/pdf",
     );
 
-    const hasGeminiSource = availableSources.some(
-      (source) => source.provider === "gemini",
-    );
-
-    if (hasPdfItems && !hasGeminiSource) {
+    if (hasPdfItems && !allowPdfUploads) {
       toast(t("toasts.pdf-blocked.title"), {
         description: t("toasts.pdf-blocked.description"),
       });
@@ -354,11 +351,15 @@ ${traits}
 
             const resText = await retryAsyncOperation(() =>
               aiClient.sendMedia(
-                base64,
-                item.mimeType,
+                {
+                  data: base64,
+                  mimeType: item.mimeType,
+                  name: item.displayName,
+                },
                 undefined,
                 source.model,
                 (text) => appendStreamedOutput(item.id, text),
+                { onlineSearch: onlineSearchEnabled },
               ),
             );
 

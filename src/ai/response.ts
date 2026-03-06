@@ -140,14 +140,33 @@ export function parseSolveResponse(response: string): SolveResponse {
     const problemText = sections["PROBLEM_TEXT"] || "";
     const explanation = sections["EXPLANATION"] || "";
     const answer = sections["ANSWER"] || "";
+    const hasOnlineSearch = Object.prototype.hasOwnProperty.call(
+      sections,
+      "ONLINE_SEARCH",
+    );
+    const onlineSearch = hasOnlineSearch
+      ? sections["ONLINE_SEARCH"]
+      : undefined;
 
-    if (problemText || explanation || answer) {
+    if (problemText || explanation || answer || hasOnlineSearch) {
+      const finalExplanation = explanation || "";
       problems.push({
-        problem: problemText,
-        explanation: explanation,
-        answer: answer,
+        problem: problemText || "",
+        explanation: finalExplanation,
+        answer: answer || "",
         // Parse steps specifically from the explanation text
-        steps: MarkdownSectionParser.parseSteps(explanation),
+        steps: MarkdownSectionParser.parseSteps(finalExplanation),
+        onlineSearch,
+      });
+    } else if (chunk.trim()) {
+      // Fallback: If the chunk has content but no headers (and no online search section found via headers)
+      // We treat the whole chunk as the explanation.
+      problems.push({
+        problem: "Parsed Content",
+        explanation: chunk.trim(),
+        answer: "",
+        steps: MarkdownSectionParser.parseSteps(chunk.trim()),
+        onlineSearch: undefined,
       });
     }
   }
@@ -161,6 +180,7 @@ export function parseSolveResponse(response: string): SolveResponse {
           answer: "",
           explanation: response,
           steps: [{ title: "Error", content: response }],
+          onlineSearch: undefined,
         },
       ],
     };

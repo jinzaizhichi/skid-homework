@@ -1,6 +1,7 @@
 import { GoogleGenAI, HarmBlockThreshold, HarmCategory } from "@google/genai";
 import type { AiChatMessage } from "./chat-types";
 import { BaseAiClient } from "./base-client";
+import type { AiFile } from "@/store/ai-store";
 
 export interface GeminiModel {
   name: string;
@@ -51,13 +52,84 @@ export class GeminiAi extends BaseAiClient {
     };
   }
 
+  private static injectCitations(
+    text: string,
+    supports: {
+      segment: { startIndex?: number; endIndex?: number };
+      groundingChunkIndices: number[];
+    }[],
+  ): string {
+    const sorted = [...supports].sort(
+      (a, b) => (b.segment.endIndex ?? 0) - (a.segment.endIndex ?? 0),
+    );
+
+    let result = text;
+    for (const support of sorted) {
+      const { segment, groundingChunkIndices } = support;
+      if (segment.endIndex === undefined || !groundingChunkIndices.length)
+        continue;
+
+      const validIndices = groundingChunkIndices.map((i) => i + 1);
+      if (!validIndices.length) continue;
+
+      const citation = ` [${validIndices.join(",")}]`;
+      const idx = segment.endIndex;
+      if (idx <= result.length) {
+        result = result.slice(0, idx) + citation + result.slice(idx);
+      }
+    }
+    return result;
+  }
+  private static formatOnlineSearch(
+    groundingChunks: { uri?: string | null; title?: string | null }[],
+    queries: string[],
+    existingText: string,
+  ): string {
+    if (!groundingChunks.length) return existingText;
+    const hasOnlineSearchSection = existingText.includes("### ONLINE_SEARCH");
+    const hasIndexedList = /### ONLINE_SEARCH[\s\S]*\\?#\d+\s-/.test(
+      existingText,
+    );
+    if (hasOnlineSearchSection && hasIndexedList) {
+      return existingText;
+    }
+
+    const unique: Map<string, { uri?: string | null; title?: string | null }> =
+      new Map();
+    groundingChunks.forEach((c) => {
+      const key = c.uri || c.title || Math.random().toString();
+      if (!unique.has(key)) unique.set(key, c);
+    });
+
+    const lines = Array.from(unique.values()).map((c, idx) => {
+      const title = c.title || c.uri || "result";
+      const uri = c.uri ?? "";
+      const link = uri ? `[${title}](${uri})` : title;
+      return `\\#${idx + 1} - ${link}  `;
+    });
+
+    const queryLine =
+      queries && queries.length ? `Queries: ${queries.join(", ")}` : undefined;
+
+    const block = [
+      "### ONLINE_SEARCH",
+      ...lines.map((l) => `${l}`),
+      ...(queryLine ? [queryLine] : []),
+    ].join("\n");
+
+    return hasOnlineSearchSection
+      ? `${existingText.trim()}\n${block}`
+      : `${existingText.trim()}\n\n${block}`;
+  }
+
   async sendMedia(
-    media: string,
-    mimeType: string,
+    file: AiFile,
     prompt?: string,
-    model = "gemini-3-pro-preview",
+    model = "gemini-3.1-pro-preview",
     callback?: (text: string) => void,
+    options?: { onlineSearch?: boolean },
   ) {
+    const { data: media, mimeType } = file;
     const contents = [];
 
     if (this.systemPrompts.length > 0) {
@@ -98,16 +170,76 @@ export class GeminiAi extends BaseAiClient {
       parts,
     });
 
+    const tools = options?.onlineSearch ? [{ googleSearch: {} }] : undefined;
+
+    const groundingChunks: { uri?: string | null; title?: string | null }[] =
+      [];
+    const groundingSupports: {
+      segment: { startIndex?: number; endIndex?: number };
+      groundingChunkIndices: number[];
+    }[] = [];
+    let webSearchQueries: string[] = [];
+
     const response = await this.ai.models.generateContentStream({
       model,
       config: {
         thinkingConfig: { thinkingBudget: this.config.thinkingBudget },
         safetySettings: this.config.safetySettings,
+        tools,
       },
       contents,
     });
 
-    return this.handleStreamResponse(response, callback);
+    let result = "";
+    for await (const chunk of response) {
+      const c = chunk as unknown as {
+        candidates?: Array<{
+          groundingMetadata?: {
+            groundingChunks?: Array<{
+              web?: {
+                uri?: string;
+                title?: string;
+              };
+            }>;
+            groundingSupports?: Array<{
+              segment: { startIndex?: number; endIndex?: number };
+              groundingChunkIndices: number[];
+            }>;
+            webSearchQueries?: string[];
+          };
+        }>;
+      };
+      const candidate = c.candidates?.[0];
+      const gm = candidate?.groundingMetadata;
+      if (gm?.groundingChunks) {
+        gm.groundingChunks.forEach((gc) =>
+          groundingChunks.push({
+            uri: gc.web?.uri,
+            title: gc.web?.title,
+          }),
+        );
+      }
+      if (gm?.groundingSupports) {
+        gm.groundingSupports.forEach((gs) => groundingSupports.push(gs));
+      }
+      if (gm?.webSearchQueries) {
+        webSearchQueries = gm.webSearchQueries as string[];
+      }
+
+      if (chunk.text) {
+        result += chunk.text;
+        callback?.(chunk.text);
+      }
+    }
+    const textWithCitations = GeminiAi.injectCitations(
+      result,
+      groundingSupports,
+    );
+    return GeminiAi.formatOnlineSearch(
+      groundingChunks,
+      webSearchQueries,
+      textWithCitations,
+    ).trim();
   }
 
   async getAvailableModels(): Promise<GeminiModel[]> {
@@ -120,8 +252,9 @@ export class GeminiAi extends BaseAiClient {
 
   async sendChat(
     messages: AiChatMessage[],
-    model = "gemini-3-pro-preview",
+    model = "gemini-3.1-pro-preview",
     callback?: (text: string) => void,
+    options?: { onlineSearch?: boolean },
   ) {
     const contents = [];
 
@@ -147,15 +280,75 @@ export class GeminiAi extends BaseAiClient {
       });
     }
 
+    const tools = options?.onlineSearch ? [{ googleSearch: {} }] : undefined;
+
+    const groundingChunks: { uri?: string | null; title?: string | null }[] =
+      [];
+    const groundingSupports: {
+      segment: { startIndex?: number; endIndex?: number };
+      groundingChunkIndices: number[];
+    }[] = [];
+    let webSearchQueries: string[] = [];
+
     const response = await this.ai.models.generateContentStream({
       model,
       config: {
         thinkingConfig: { thinkingBudget: this.config.thinkingBudget },
         safetySettings: this.config.safetySettings,
+        tools,
       },
       contents,
     });
 
-    return this.handleStreamResponse(response, callback);
+    let result = "";
+    for await (const chunk of response) {
+      const c = chunk as unknown as {
+        candidates?: Array<{
+          groundingMetadata?: {
+            groundingChunks?: Array<{
+              web?: {
+                uri?: string;
+                title?: string;
+              };
+            }>;
+            groundingSupports?: Array<{
+              segment: { startIndex?: number; endIndex?: number };
+              groundingChunkIndices: number[];
+            }>;
+            webSearchQueries?: string[];
+          };
+        }>;
+      };
+      const candidate = c.candidates?.[0];
+      const gm = candidate?.groundingMetadata;
+      if (gm?.groundingChunks) {
+        gm.groundingChunks.forEach((gc) =>
+          groundingChunks.push({
+            uri: gc.web?.uri,
+            title: gc.web?.title,
+          }),
+        );
+      }
+      if (gm?.groundingSupports) {
+        gm.groundingSupports.forEach((gs) => groundingSupports.push(gs));
+      }
+      if (gm?.webSearchQueries) {
+        webSearchQueries = gm.webSearchQueries as string[];
+      }
+
+      if (chunk.text) {
+        result += chunk.text;
+        callback?.(chunk.text);
+      }
+    }
+    const textWithCitations = GeminiAi.injectCitations(
+      result,
+      groundingSupports,
+    );
+    return GeminiAi.formatOnlineSearch(
+      groundingChunks,
+      webSearchQueries,
+      textWithCitations,
+    ).trim();
   }
 }

@@ -1,4 +1,5 @@
 import type { AiChatMessage } from "./chat-types";
+import type { AiFile } from "@/store/ai-store";
 
 export abstract class BaseAiClient {
   protected systemPrompts: string[] = [];
@@ -50,8 +51,7 @@ export abstract class BaseAiClient {
   }
 
   abstract sendMedia(
-    media: string,
-    mimeType: string,
+    file: AiFile,
     prompt?: string,
     model?: string,
     callback?: (text: string) => void,

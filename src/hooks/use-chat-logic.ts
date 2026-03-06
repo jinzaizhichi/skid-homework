@@ -7,12 +7,14 @@ import { useTranslation } from "react-i18next";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import { decodeSeedChat, type SeedChatState } from "@/lib/chat-seed";
-import { useAiStore, type AiSource } from "@/store/ai-store";
+import { type AiSource, useAiStore } from "@/store/ai-store";
 import { useChatStore } from "@/store/chat-store";
 import type { AiChatMessage } from "@/ai/chat-types";
+import { isNonRetryableError } from "@/ai/errors";
 
 import chatPrompt from "@/ai/prompts/chat.prompt.md";
 import { getEnabledToolCallingPrompts } from "@/ai/prompts/prompt-manager";
+import { useSettingsStore } from "@/store/settings-store";
 
 function trimTitle(text: string, fallback: string) {
   const trimmed = text.replace(/\s+/g, " ").trim();
@@ -65,6 +67,7 @@ export function useChatLogic() {
   const [searchResults, setSearchResults] = useState<Set<string> | null>(null);
   const [modelInput, setModelInput] = useState("");
   const [currentSourceId, setCurrentSourceId] = useState<string | null>(null);
+  const onlineSearchEnabled = useSettingsStore((s) => s.onlineSearchEnabled);
 
   // Handle Search Logic
   useEffect(() => {
@@ -314,7 +317,7 @@ export function useChatLogic() {
       aiClient.setAvailableTools(getEnabledToolCallingPrompts());
 
       let aggregated = "";
-      await aiClient.sendChat(
+      const finalContent = await aiClient.sendChat(
         [...contextMessages, ...history],
         modelName,
         (delta) => {
@@ -323,16 +326,24 @@ export function useChatLogic() {
             updateMessage(chatId!, assistantMessageId, { content: aggregated });
           }
         },
+        { onlineSearch: onlineSearchEnabled },
       );
 
-      if (aggregated.trim()) {
+      if (finalContent && finalContent.trim()) {
+        await updateMessage(chatId!, assistantMessageId, {
+          content: finalContent.trim(),
+        });
+      } else if (aggregated.trim()) {
         await updateMessage(chatId!, assistantMessageId, {
           content: aggregated.trim(),
         });
       }
     } catch (error) {
       console.error(error);
-      toast.error(t("errors.send-failed"));
+      // NonRetryableError already displays a specific toast in the AI client
+      if (!isNonRetryableError(error)) {
+        toast.error(t("errors.send-failed"));
+      }
       if (chatId && assistantMessageId) {
         await updateMessage(chatId, assistantMessageId, {
           error: true,

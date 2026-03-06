@@ -1,7 +1,7 @@
 "use client";
 
 import "katex/dist/katex.min.css";
-import { useRef, useState, type ComponentProps } from "react";
+import { type ComponentProps, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
@@ -197,6 +197,7 @@ export default function SolutionViewer({
         answer={answerText}
         problem={problemText}
         explanation={explanationText}
+        onlineSearch={activeProblem?.onlineSearch}
       />
       <section
         ref={viewerRef}
@@ -249,6 +250,22 @@ export default function SolutionViewer({
               steps={activeProblem?.steps}
               key={entry.item.id}
             />
+
+            {activeProblem?.onlineSearch !== undefined && (
+              <div>
+                <div className="mb-1 text-sm font-medium text-slate-300">
+                  {t("online-search.title")}
+                </div>
+                <div className="rounded-lg bg-slate-900/60 p-3 text-sm">
+                  <MemoizedMarkdown
+                    source={
+                      activeProblem.onlineSearch ||
+                      t("online-search.placeholder")
+                    }
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="flex flex-wrap gap-2">
               <ImproveSolutionDialog

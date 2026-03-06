@@ -31,8 +31,9 @@ export interface ExplanationStep {
 export interface ProblemSolution {
   problem: string;
   answer: string;
-  explanation: string;
-  steps: ExplanationStep[];
+  explanation: string; // The full raw markdown
+  steps: ExplanationStep[]; // Parsed steps
+  onlineSearch?: string; // Raw ONLINE_SEARCH section content
 }
 
 export interface ProblemsState {
@@ -284,11 +285,13 @@ export const useProblemsStore = create<ProblemsState>()(
           if (!currentSolution) return state;
 
           const updatedProblems = [...currentSolution.problems];
+          const existingProblem = updatedProblems[problemIndex];
           updatedProblems[problemIndex] = {
-            ...updatedProblems[problemIndex],
+            ...existingProblem,
             answer: newAnswer,
             explanation: newExplanation,
             steps: newSteps,
+            onlineSearch: existingProblem?.onlineSearch,
           };
 
           const updatedSolution = {

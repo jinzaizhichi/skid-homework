@@ -11,6 +11,9 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useShortcut } from "@/hooks/use-shortcut";
 import { ShortcutHint } from "../ShortcutHint";
+import { useSettingsStore } from "@/store/settings-store";
+import { OnlineSearchToggle } from "@/components/actions/OnlineSearchToggle.tsx";
+import ModelSelectorPopover from "./ModelSelectorPopover";
 
 export type ActionsCardProps = {
   items: FileItem[];
@@ -34,7 +37,15 @@ export default function ActionsCard({
   className,
 }: ActionsCardProps) {
   const { t } = useTranslation("commons", { keyPrefix: "actions" });
+  const { t: tCommon } = useTranslation("commons");
   const router = useRouter();
+
+  const {
+    showModelSelectorInScanner,
+    showOnlineSearchInScanner,
+    onlineSearchEnabled,
+    setOnlineSearchEnabled,
+  } = useSettingsStore((s) => s);
 
   const handleSettingsBtnClick = useCallback(() => {
     router.push("/settings");
@@ -84,12 +95,27 @@ export default function ActionsCard({
 
         <UploadFilesInfo itemsLength={items.length} totalBytes={totalBytes} />
 
+        {showModelSelectorInScanner && <ModelSelectorPopover />}
+
         <ActionsArea
           itemsLength={items.length}
           clearAll={clearAll}
           startScan={startScan}
           layout={layout}
         />
+
+        {showOnlineSearchInScanner && (
+          <div className="flex w-full">
+            <OnlineSearchToggle
+              checked={onlineSearchEnabled}
+              onCheckedChange={setOnlineSearchEnabled}
+              label={onlineSearchEnabled
+                ? tCommon("settings-page.thinking.online-search.toggle.enabled")
+                : tCommon("settings-page.thinking.online-search.toggle.disabled")
+              }
+            />
+          </div>
+        )}
 
         <div
           className={cn(
