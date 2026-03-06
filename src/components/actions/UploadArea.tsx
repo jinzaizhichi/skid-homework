@@ -1,4 +1,4 @@
-import { Camera, FileText, MoreVertical, Upload } from "lucide-react";
+import { FileText, MoreVertical, Upload } from "lucide-react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useCallback, useEffect, useRef, useState } from "react";
