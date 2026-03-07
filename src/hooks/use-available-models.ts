@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { type AiModelSummary, type AiSource, useAiStore, } from "@/store/ai-store";
+import {
+  type AiModelSummary,
+  type AiSource,
+  useAiStore,
+} from "@/store/ai-store";
 
 export interface SourceModels {
   source: AiSource;
