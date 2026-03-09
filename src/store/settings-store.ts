@@ -30,17 +30,9 @@ const DEFAULT_SHORTCUTS: ShortcutMap = {
 
 const DEFAULT_LANGUAGE: LanguagePreference = "en";
 
-const DISABLE_QWEN_HINT_DEFAULT =
-  typeof process !== "undefined" &&
-  process.env.NEXT_PUBLIC_DISABLE_QWEN_HINT === "true";
-export const SHOULD_SHOW_QWEN_HINT_DEFAULT = !DISABLE_QWEN_HINT_DEFAULT;
-
 export interface SettingsState {
   imageEnhancement: boolean;
   setImageEnhancement: (imagePostprocessing: boolean) => void;
-
-  showQwenHint: boolean;
-  setShowQwenHint: (show: boolean) => void;
 
   theme: ThemePreference;
   setThemePreference: (theme: ThemePreference) => void;
@@ -79,7 +71,6 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       imageEnhancement: false,
-      showQwenHint: SHOULD_SHOW_QWEN_HINT_DEFAULT,
       theme: "system",
       language: DEFAULT_LANGUAGE,
       languageInitialized: false,
@@ -93,7 +84,6 @@ export const useSettingsStore = create<SettingsState>()(
       showOnlineSearchInScanner: false,
 
       setImageEnhancement: (state) => set({ imageEnhancement: state }),
-      setShowQwenHint: (state) => set({ showQwenHint: state }),
       setThemePreference: (theme) => set({ theme }),
       setLanguage: (language) =>
         set({
@@ -136,7 +126,6 @@ export const useSettingsStore = create<SettingsState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         imageEnhancement: state.imageEnhancement,
-        showQwenHint: state.showQwenHint,
         theme: state.theme,
         language: state.language,
         languageInitialized: state.languageInitialized,
@@ -168,9 +157,6 @@ export const useSettingsStore = create<SettingsState>()(
           keybindings: existing
             ? { ...DEFAULT_SHORTCUTS, ...existing }
             : { ...DEFAULT_SHORTCUTS },
-          showQwenHint:
-            (data as { showQwenHint?: boolean }).showQwenHint ??
-            SHOULD_SHOW_QWEN_HINT_DEFAULT,
           languageInitialized:
             (data as { languageInitialized?: boolean }).languageInitialized ??
             true,

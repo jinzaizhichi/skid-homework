@@ -271,16 +271,6 @@
   "uploads-info": {
     "selected": "Selected"
   },
-  "qwen-callout": {
-    "title": "Official Qwen3 Service",
-    "badge": "Free",
-    "button": "Get token",
-    "tooltip": {
-      "prefix": "How to import into SkidHomework? Visit",
-      "link": "Console -> Token Management",
-      "suffix": "-> Chat quick import for SkidHomework."
-    }
-  },
   "settings-page": {
     "heading": "SkidHomework Settings",
     "back": "Back",
@@ -510,7 +500,6 @@
       },
       "ui": {
         "title": "UI",
-        "show-qwen-hint": "Show Qwen3 service tip",
         "clear-dialog-on-submit": "Clear dialog after submit"
       },
       "explanation": {
