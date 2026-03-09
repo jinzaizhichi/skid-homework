@@ -60,9 +60,7 @@ export class OpenAiClient extends BaseAiClient {
     webSearchToolType?: string
   ) {
     super();
-    // Preserve legacy behavior for existing sources that may pass `undefined`
-    // while keeping `false` as the default for new callers.
-    this.useResponsesApi = useResponsesApi ?? false;
+    this.useResponsesApi = useResponsesApi;
     this.webSearchToolType = webSearchToolType;
     this.client = new OpenAI({
       apiKey,
