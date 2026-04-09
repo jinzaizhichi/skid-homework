@@ -682,7 +682,10 @@
     "problem": "Problem",
     "answer": "Answer",
     "explanation": "Explanation",
-    "online-search": "Online Search"
+    "online-search": "Online Search",
+    "copy": {
+      "success": "Copied"
+    }
   },
   "sources": {
     "upload": "Upload",

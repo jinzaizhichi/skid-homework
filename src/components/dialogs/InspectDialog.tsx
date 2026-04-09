@@ -32,12 +32,12 @@ export default function InspectDialog({
   explanation,
   onlineSearch,
 }: InspectDialogProps) {
+  const { t } = useTranslation("commons", { keyPrefix: "inspect-dialog" });
+
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success(t("dev.copy.success", { defaultValue: "Copied" }));
   };
-
-  const { t } = useTranslation("commons", { keyPrefix: "inspect-dialog" });
 
   return (
     <Dialog open={open} onOpenChange={onChange}>
